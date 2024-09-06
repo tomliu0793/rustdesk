@@ -1,14 +1,7 @@
 name: Docker Image CI
 
 on:
-  workflow_call:
-    inputs:
-      upload-artifact:
-        type: boolean
-        default: true
-      upload-tag:
-        type: string
-        default: "docker"
+  workflow_dispatch:
 
 jobs:
 
