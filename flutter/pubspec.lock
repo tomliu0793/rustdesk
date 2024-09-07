@@ -1322,6 +1322,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.1"
+  uni_links_desktop:
+    dependency: "direct main"
+    description:
+      name: uni_links_desktop
+      sha256: a0218c91d6d88f32b749482d571640ca9912e2aeaa390688afbf364bc5075a5c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.6"
   uni_links_platform_interface:
     dependency: transitive
     description:
