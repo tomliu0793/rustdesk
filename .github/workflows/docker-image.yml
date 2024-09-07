@@ -13,7 +13,7 @@ jobs:
     - name: docker make
       uses: actions/checkout@v4
     - name: Build the Docker image
-      run: 
+      run: |
         docker build . --file Dockerfile --tag my-test:dev 
         docker save -o my-test:dev.tar my-test:dev
 
