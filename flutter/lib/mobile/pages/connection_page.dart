@@ -9,16 +9,20 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_hbb/models/peer_model.dart';
 
 import '../../common.dart';
+import '../../common/widgets/login.dart';
+import '../../common/widgets/my_group.dart';
 import '../../common/widgets/peer_tab_page.dart';
 import '../../common/widgets/autocomplete.dart';
 import '../../consts.dart';
 import '../../models/model.dart';
 import '../../models/platform_model.dart';
 import 'home_page.dart';
+import 'scan_page.dart';
+import 'settings_page.dart';
 
 /// Connection page for connecting to a remote peer.
 class ConnectionPage extends StatefulWidget implements PageShape {
-  ConnectionPage({Key? key, required this.appBarActions}) : super(key: key);
+  ConnectionPage({Key? key}) : super(key: key);
 
   @override
   final icon = const Icon(Icons.connected_tv);
@@ -26,11 +30,35 @@ class ConnectionPage extends StatefulWidget implements PageShape {
   @override
   final title = translate("Connection");
 
+  // @override
+  // final List<Widget> appBarActions;
+
   @override
-  final List<Widget> appBarActions;
+  final List<Widget>  appBarActions = isWeb ? <Widget>[] : <Widget>[_ReflashAction()];
 
   @override
   State<ConnectionPage> createState() => _ConnectionPageState();
+}
+
+
+class _ReflashAction extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return
+      RefreshWidget(
+        onPressed: () {
+          gFFI.groupModel.pull(force: true);
+        },
+        child: RotatedBox(
+            quarterTurns: 2,
+            child: Icon(
+              Icons.refresh,
+              size: 36,
+            )
+        )
+    );
+  }
+  
 }
 
 /// State for the connection page.
@@ -81,19 +109,21 @@ class _ConnectionPageState extends State<ConnectionPage> {
   @override
   Widget build(BuildContext context) {
     Provider.of<FfiModel>(context);
-    return CustomScrollView(
-      slivers: [
-        SliverList(
-            delegate: SliverChildListDelegate([
-          if (!bind.isCustomClient()) _buildUpdateUI(),
-          _buildRemoteIDTextField(),
-        ])),
-        SliverFillRemaining(
-          hasScrollBody: true,
-          child: PeerTabPage(),
-        )
-      ],
-    ).marginOnly(top: 2, left: 10, right: 10);
+    // return CustomScrollView(
+    //   slivers: [
+    //     SliverList(
+    //         delegate: SliverChildListDelegate([
+    //       if (!bind.isCustomClient()) _buildUpdateUI(),
+    //       _buildRemoteIDTextField(),
+    //     ])),
+    //     SliverFillRemaining(
+    //       hasScrollBody: true,
+    //       child: PeerTabPage(),
+    //     )
+    //   ],
+    // ).marginOnly(top: 2, left: 10, right: 10);
+    return MyGroup();
+
   }
 
   /// Callback for the connect button.

@@ -47,13 +47,12 @@ class HomePageState extends State<HomePage> {
   void initPages() {
     _pages.clear();
     if (!bind.isIncomingOnly()) {
-      _pages.add(ConnectionPage(
-        appBarActions: [],
-      ));
+      _pages.add(ConnectionPage());
     }
     if (isAndroid && !bind.isOutgoingOnly()) {
       _chatPageTabIndex = _pages.length;
-      _pages.addAll([ChatPage(type: ChatPageType.mobileMain), ServerPage()]);
+      // _pages.addAll([ChatPage(type: ChatPageType.mobileMain), ServerPage()]);
+      _pages.addAll([ServerPage()]);
     }
     _pages.add(SettingsPage());
   }
@@ -149,13 +148,14 @@ class HomePageState extends State<HomePage> {
         ],
       );
     }
-    return Text(bind.mainGetAppNameSync());
+    // return Text(bind.mainGetAppNameSync());
+    return Text("PyDesk");
   }
 }
 
 class WebHomePage extends StatelessWidget {
   final connectionPage =
-      ConnectionPage(appBarActions: <Widget>[const WebSettingsPage()]);
+      ConnectionPage();
 
   @override
   Widget build(BuildContext context) {

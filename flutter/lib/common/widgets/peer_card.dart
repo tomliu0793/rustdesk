@@ -1188,7 +1188,8 @@ class MyGroupPeerCard extends BasePeerCard {
     // if (await bind.mainPeerHasPassword(id: peer.id)) {
     //   menuItems.add(_unrememberPasswordAction(peer.id));
     // }
-    if (gFFI.userModel.userName.isNotEmpty) {
+    var zed_flag = false;
+    if (gFFI.userModel.userName.isNotEmpty&&zed_flag) {
       menuItems.add(_addToAb(peer));
     }
     return menuItems;

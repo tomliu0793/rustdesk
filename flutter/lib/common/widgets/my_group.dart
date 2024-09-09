@@ -91,6 +91,7 @@ class _MyGroupState extends State<MyGroup> {
   }
 
   Widget _buildPortrait() {
+    var zed_flag = false;
     return Column(
       children: [
         Container(
@@ -102,11 +103,13 @@ class _MyGroupState extends State<MyGroup> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildLeftHeader(),
-                Container(
-                  width: double.infinity,
-                  child: _buildUserContacts(),
-                )
+                if (zed_flag )
+                  _buildLeftHeader(),
+                if (zed_flag )
+                  Container(
+                    width: double.infinity,
+                    child: _buildUserContacts(),
+                  )
               ],
             ),
           ),

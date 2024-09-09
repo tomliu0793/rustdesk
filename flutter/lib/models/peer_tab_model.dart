@@ -37,12 +37,19 @@ class PeerTabModel with ChangeNotifier {
     IconFont.addressBook,
     Icons.group,
   ];
+  // List<bool> isEnabled = List.from([
+  //   true,
+  //   true,
+  //   !isWeb,
+  //   !(bind.isDisableAb() || bind.isDisableAccount()),
+  //   !(bind.isDisableGroupPanel() || bind.isDisableAccount()),
+  // ]);
   List<bool> isEnabled = List.from([
+    false,
+    false,
+    false,
+    false,
     true,
-    true,
-    !isWeb,
-    !(bind.isDisableAb() || bind.isDisableAccount()),
-    !(bind.isDisableGroupPanel() || bind.isDisableAccount()),
   ]);
   final List<bool> _isVisible = List.filled(maxTabCount, true, growable: false);
   List<bool> get isVisibleEnabled => () {

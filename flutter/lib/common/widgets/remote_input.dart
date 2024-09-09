@@ -89,7 +89,9 @@ class _RawTouchGestureDetectorRegionState
   FFI get ffi => widget.ffi;
   FfiModel get ffiModel => widget.ffiModel;
   InputModel get inputModel => widget.inputModel;
-  bool get handleTouch => (isDesktop || isWebDesktop) || ffiModel.touchMode;
+  // bool get handleTouch => (isDesktop || isWebDesktop) || ffiModel.touchMode;
+  bool get handleTouch => true;
+  bool zed_flag =false;
   SessionID get sessionId => ffi.sessionId;
 
   @override
@@ -302,7 +304,7 @@ class _RawTouchGestureDetectorRegionState
     if (lastDeviceKind != PointerDeviceKind.touch) {
       return;
     }
-    if ((isDesktop || isWebDesktop)) {
+    if ((isDesktop || isWebDesktop)||!zed_flag) {
       final scale = ((d.scale - _scale) * 1000).toInt();
       _scale = d.scale;
 
@@ -326,7 +328,7 @@ class _RawTouchGestureDetectorRegionState
     if (lastDeviceKind != PointerDeviceKind.touch) {
       return;
     }
-    if ((isDesktop || isWebDesktop)) {
+    if ((isDesktop || isWebDesktop)||!zed_flag) {
       bind.sessionSendPointer(
           sessionId: sessionId,
           msg: json.encode(

@@ -51,17 +51,18 @@ class _DropDownAction extends StatelessWidget {
                   color: checked ? null : Colors.transparent,
                 ));
           }
-
+          final zed_flag = false;
           final approveMode = gFFI.serverModel.approveMode;
           final verificationMethod = gFFI.serverModel.verificationMethod;
           final showPasswordOption = approveMode != 'click';
           final isApproveModeFixed = isOptionFixed(kOptionApproveMode);
           return [
-            PopupMenuItem(
-              enabled: gFFI.serverModel.connectStatus > 0,
-              value: "changeID",
-              child: Text(translate("Change ID")),
-            ),
+            if(zed_flag)
+              PopupMenuItem(
+                enabled: gFFI.serverModel.connectStatus > 0,
+                value: "changeID",
+                child: Text(translate("Change ID")),
+              ),
             const PopupMenuDivider(),
             PopupMenuItem(
               value: 'AcceptSessionsViaPassword',
@@ -232,13 +233,14 @@ class ServiceNotRunningNotification extends StatelessWidget {
             ElevatedButton.icon(
                 icon: const Icon(Icons.play_arrow),
                 onPressed: () {
-                  if (gFFI.userModel.userName.value.isEmpty &&
-                      bind.mainGetLocalOption(key: "show-scam-warning") !=
-                          "N") {
-                    showScamWarning(context, serverModel);
-                  } else {
-                    serverModel.toggleService();
-                  }
+                  // if (gFFI.userModel.userName.value.isEmpty &&
+                  //     bind.mainGetLocalOption(key: "show-scam-warning") !=
+                  //         "N") {
+                  //   showScamWarning(context, serverModel);
+                  // } else {
+                  //   serverModel.toggleService();
+                  // }
+                  serverModel.toggleService();
                 },
                 label: Text(translate("Start service")))
           ],
@@ -560,6 +562,7 @@ class _PermissionCheckerState extends State<PermissionChecker> {
   Widget build(BuildContext context) {
     final serverModel = Provider.of<ServerModel>(context);
     final hasAudioPermission = androidVersion >= 30;
+    var zed_flag = false;
     return PaddingCard(
         title: translate("Permissions"),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -578,7 +581,7 @@ class _PermissionCheckerState extends State<PermissionChecker> {
               serverModel.mediaOk,
               !serverModel.mediaOk &&
                       gFFI.userModel.userName.value.isEmpty &&
-                      bind.mainGetLocalOption(key: "show-scam-warning") != "N"
+                      bind.mainGetLocalOption(key: "show-scam-warning") != "N" && zed_flag
                   ? () => showScamWarning(context, serverModel)
                   : serverModel.toggleService),
           PermissionRow(translate("Input Control"), serverModel.inputOk,
@@ -627,6 +630,7 @@ class ConnectionManager extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final serverModel = Provider.of<ServerModel>(context);
+    var zed_flag = false;
     return Column(
         children: serverModel.clients
             .map((client) => PaddingCard(
@@ -641,22 +645,23 @@ class ConnectionManager extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(child: ClientInfo(client)),
-                      Expanded(
-                          flex: -1,
-                          child: client.isFileTransfer || !client.authorized
-                              ? const SizedBox.shrink()
-                              : IconButton(
-                                  onPressed: () {
-                                    gFFI.chatModel.changeCurrentKey(
-                                        MessageKey(client.peerId, client.id));
-                                    final bar = navigationBarKey.currentWidget;
-                                    if (bar != null) {
-                                      bar as BottomNavigationBar;
-                                      bar.onTap!(1);
-                                    }
-                                  },
-                                  icon: unreadTopRightBuilder(
-                                      client.unreadChatMessageCount)))
+                      if (zed_flag)
+                        Expanded(
+                            flex: -1,
+                            child: client.isFileTransfer || !client.authorized
+                                ? const SizedBox.shrink()
+                                : IconButton(
+                                    onPressed: () {
+                                      gFFI.chatModel.changeCurrentKey(
+                                          MessageKey(client.peerId, client.id));
+                                      final bar = navigationBarKey.currentWidget;
+                                      if (bar != null) {
+                                        bar as BottomNavigationBar;
+                                        bar.onTap!(1);
+                                      }
+                                    },
+                                    icon: unreadTopRightBuilder(
+                                        client.unreadChatMessageCount)))
                     ],
                   ),
                   client.authorized

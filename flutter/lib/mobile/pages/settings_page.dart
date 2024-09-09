@@ -28,8 +28,11 @@ class SettingsPage extends StatefulWidget implements PageShape {
   @override
   final icon = Icon(Icons.settings);
 
+  // @override
+  // final appBarActions = bind.isDisableSettings() ? [] : [ScanButton()];
+
   @override
-  final appBarActions = bind.isDisableSettings() ? [] : [ScanButton()];
+  final appBarActions = bind.isDisableSettings() ? [] : [];
 
   @override
   State<SettingsPage> createState() => _SettingsState();
@@ -68,9 +71,9 @@ KeepScreenOn optionToKeepScreenOn(String value) {
 class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   final _hasIgnoreBattery =
       false; //androidVersion >= 26; // remove because not work on every device
-  var _ignoreBatteryOpt = false;
-  var _enableStartOnBoot = false;
-  var _floatingWindowDisabled = false;
+  var _ignoreBatteryOpt = true;
+  var _enableStartOnBoot = true;
+  var _floatingWindowDisabled = true;
   var _keepScreenOn = KeepScreenOn.duringControlled; // relay on floating window
   var _enableAbr = false;
   var _denyLANDiscovery = false;
@@ -89,6 +92,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _hideProxy = false;
   var _hideNetwork = false;
   var _enableTrustedDevices = false;
+  var zed_flag = false;
 
   _SettingsState() {
     _enableAbr = option2bool(
@@ -486,8 +490,9 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(translate('Keep RustDesk background service')),
-                    Text('* ${translate('Ignore Battery Optimizations')}',
-                        style: Theme.of(context).textTheme.bodySmall),
+                    if(zed_flag)
+                      Text('* ${translate('Ignore Battery Optimizations')}',
+                          style: Theme.of(context).textTheme.bodySmall),
                   ]),
               onToggle: (v) async {
                 if (v) {
@@ -519,9 +524,10 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         initialValue: _enableStartOnBoot,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("${translate('Start on boot')} (beta)"),
-          Text(
-              '* ${translate('Start the screen sharing service on boot, requires special permissions')}',
-              style: Theme.of(context).textTheme.bodySmall),
+	  if(zed_flag)
+		  Text(
+		      '* ${translate('Start the screen sharing service on boot, requires special permissions')}',
+		      style: Theme.of(context).textTheme.bodySmall),
         ]),
         onToggle: (toValue) async {
           if (toValue) {
@@ -568,8 +574,9 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         initialValue: !_floatingWindowDisabled,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(translate('Floating window')),
-          Text('* ${translate('floating_window_tip')}',
-              style: Theme.of(context).textTheme.bodySmall),
+          if(zed_flag)
+            Text('* ${translate('floating_window_tip')}',
+                style: Theme.of(context).textTheme.bodySmall),
         ]),
         onToggle: bind.mainIsOptionFixed(key: kOptionDisableFloatingWindow)
             ? null
@@ -623,41 +630,44 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
               ),
             ],
           ),
-        SettingsSection(title: Text(translate("Settings")), tiles: [
-          if (!disabledSettings && !_hideNetwork && !_hideServer)
-            SettingsTile(
-                title: Text(translate('ID/Relay Server')),
-                leading: Icon(Icons.cloud),
+        if(zed_flag)
+          SettingsSection(title: Text(translate("Settings")), tiles: [
+            if (!disabledSettings && !_hideNetwork && !_hideServer&&zed_flag)
+              SettingsTile(
+                  title: Text(translate('ID/Relay Server')),
+                  leading: Icon(Icons.cloud),
+                  onPressed: (context) {
+                    showServerSettings(gFFI.dialogManager);
+                  }),
+            if (!isIOS && !_hideNetwork && !_hideProxy&&zed_flag)
+              SettingsTile(
+                  title: Text(translate('Socks5/Http(s) Proxy')),
+                  leading: Icon(Icons.network_ping),
+                  onPressed: (context) {
+                    changeSocks5Proxy();
+                  }),
+            if(zed_flag)
+              SettingsTile(
+                  title: Text(translate('Language')),
+                  leading: Icon(Icons.translate),
+                  onPressed: (context) {
+                    showLanguageSettings(gFFI.dialogManager);
+                  }),
+            if(zed_flag)
+              SettingsTile(
+                title: Text(translate(
+                    Theme.of(context).brightness == Brightness.light
+                        ? 'Light Theme'
+                        : 'Dark Theme')),
+                leading: Icon(Theme.of(context).brightness == Brightness.light
+                    ? Icons.dark_mode
+                    : Icons.light_mode),
                 onPressed: (context) {
-                  showServerSettings(gFFI.dialogManager);
-                }),
-          if (!isIOS && !_hideNetwork && !_hideProxy)
-            SettingsTile(
-                title: Text(translate('Socks5/Http(s) Proxy')),
-                leading: Icon(Icons.network_ping),
-                onPressed: (context) {
-                  changeSocks5Proxy();
-                }),
-          SettingsTile(
-              title: Text(translate('Language')),
-              leading: Icon(Icons.translate),
-              onPressed: (context) {
-                showLanguageSettings(gFFI.dialogManager);
-              }),
-          SettingsTile(
-            title: Text(translate(
-                Theme.of(context).brightness == Brightness.light
-                    ? 'Light Theme'
-                    : 'Dark Theme')),
-            leading: Icon(Theme.of(context).brightness == Brightness.light
-                ? Icons.dark_mode
-                : Icons.light_mode),
-            onPressed: (context) {
-              showThemeSettings(gFFI.dialogManager);
-            },
-          )
-        ]),
-        if (isAndroid)
+                  showThemeSettings(gFFI.dialogManager);
+                },
+            )
+          ]),
+        if (isAndroid&&zed_flag)
           SettingsSection(title: Text(translate('Hardware Codec')), tiles: [
             SettingsTile.switchTile(
               title: Text(translate('Enable hardware codec')),
@@ -674,7 +684,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                     },
             ),
           ]),
-        if (isAndroid && !outgoingOnly)
+        if (isAndroid && !outgoingOnly && zed_flag)
           SettingsSection(
             title: Text(translate("Recording")),
             tiles: [
@@ -706,17 +716,12 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         if (isAndroid &&
             !disabledSettings &&
             !outgoingOnly &&
-            !hideSecuritySettings)
-          SettingsSection(title: Text('2FA'), tiles: tfaTiles),
-        if (isAndroid &&
-            !disabledSettings &&
-            !outgoingOnly &&
-            !hideSecuritySettings)
+            !hideSecuritySettings&&zed_flag)
           SettingsSection(
             title: Text(translate("Share Screen")),
             tiles: shareScreenTiles,
           ),
-        if (!bind.isIncomingOnly()) defaultDisplaySection(),
+        if (!bind.isIncomingOnly()&&zed_flag) defaultDisplaySection(),
         if (isAndroid &&
             !disabledSettings &&
             !outgoingOnly &&
@@ -725,48 +730,49 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
             title: Text(translate("Enhancements")),
             tiles: enhancementsTiles,
           ),
-        SettingsSection(
-          title: Text(translate("About")),
-          tiles: [
-            SettingsTile(
-                onPressed: (context) async {
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  }
-                },
-                title: Text(translate("Version: ") + version),
-                value: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text('rustdesk.com',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      )),
-                ),
-                leading: Icon(Icons.info)),
-            SettingsTile(
-                title: Text(translate("Build Date")),
-                value: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text(_buildDate),
-                ),
-                leading: Icon(Icons.query_builder)),
-            if (isAndroid)
+        if(zed_flag)
+          SettingsSection(
+            title: Text(translate("About")),
+            tiles: [
               SettingsTile(
-                  onPressed: (context) => onCopyFingerprint(_fingerprint),
-                  title: Text(translate("Fingerprint")),
+                  onPressed: (context) async {
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url));
+                    }
+                  },
+                  title: Text(translate("Version: ") + version),
                   value: Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text(_fingerprint),
+                    child: Text('',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                        )),
                   ),
-                  leading: Icon(Icons.fingerprint)),
-            SettingsTile(
-              title: Text(translate("Privacy Statement")),
-              onPressed: (context) =>
-                  launchUrlString('https://rustdesk.com/privacy.html'),
-              leading: Icon(Icons.privacy_tip),
-            )
-          ],
-        ),
+                  leading: Icon(Icons.info)),
+              SettingsTile(
+                  title: Text(translate("Build Date")),
+                  value: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(_buildDate),
+                  ),
+                  leading: Icon(Icons.query_builder)),
+              if (isAndroid)
+                SettingsTile(
+                    onPressed: (context) => onCopyFingerprint(_fingerprint),
+                    title: Text(translate("Fingerprint")),
+                    value: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(_fingerprint),
+                    ),
+                    leading: Icon(Icons.fingerprint)),
+              SettingsTile(
+                title: Text(translate("Privacy Statement")),
+                onPressed: (context) =>
+                    launchUrlString('https://rustdesk.com/privacy.html'),
+                leading: Icon(Icons.privacy_tip),
+              )
+            ],
+          ),
       ],
     );
     return settings;

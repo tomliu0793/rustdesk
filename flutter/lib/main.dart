@@ -29,7 +29,7 @@ import 'models/platform_model.dart';
 
 import 'package:flutter_hbb/plugin/handlers.dart'
     if (dart.library.html) 'package:flutter_hbb/web/plugin/handlers.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// Basic window and launch properties.
 int? kWindowId;
 WindowType? kWindowType;
@@ -40,6 +40,8 @@ Future<void> main(List<String> args) async {
 
   debugPrint("launch args: $args");
   kBootArgs = List.from(args);
+
+  await dotenv.load(fileName: ".env");
 
   if (!isDesktop) {
     runMobileApp();
@@ -160,9 +162,32 @@ void runMobileApp() async {
   draggablePositions.load();
   await Future.wait([gFFI.abModel.loadCache(), gFFI.groupModel.loadCache()]);
   gFFI.userModel.refreshCurrentUser();
+  await initServerAddress();
   runApp(App());
   if (!isWeb) await initUniLinks();
 }
+
+Future<void> initServerAddress() async {
+  Map<String, dynamic> options = jsonDecode(await bind.mainGetOptions());
+  ServerConfig serverConfig = ServerConfig.fromOptions(options);
+  RxString idServerMsg = ''.obs;
+  RxString relayServerMsg = ''.obs;
+  RxString apiServerMsg = ''.obs;
+  final errMsgs = [
+    idServerMsg,
+    relayServerMsg,
+    apiServerMsg,
+  ];
+  bool ret = await setServerConfig(
+    null,
+    errMsgs,
+    ServerConfig(
+    idServer: serverConfig.idServer,
+    relayServer: serverConfig.relayServer,
+    apiServer: serverConfig.apiServer,
+    key: serverConfig.key));
+}
+
 
 void runMultiWindow(
   Map<String, dynamic> argument,

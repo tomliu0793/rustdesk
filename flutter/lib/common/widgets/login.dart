@@ -494,7 +494,8 @@ Future<bool?> loginDialog() async {
       } on RequestException catch (err) {
         passwordMsg = translate(err.cause);
       } catch (err) {
-        passwordMsg = "Unknown Error: $err";
+        // passwordMsg = "Unknown Error: $err";
+        passwordMsg = "Unknown Error:check network";
       }
       curOP.value = '';
       setState(() => isInProgress = false);

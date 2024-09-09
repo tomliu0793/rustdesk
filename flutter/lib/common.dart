@@ -38,7 +38,7 @@ import 'package:flutter_hbb/native/win32.dart'
     if (dart.library.html) 'package:flutter_hbb/web/win32.dart';
 import 'package:flutter_hbb/native/common.dart'
     if (dart.library.html) 'package:flutter_hbb/web/common.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 final globalKey = GlobalKey<NavigatorState>();
 final navigationBarKey = GlobalKey();
 
@@ -1518,7 +1518,7 @@ String translate(String name) {
   if (name.startsWith('Failed to') && name.contains(': ')) {
     return name.split(': ').map((x) => translate(x)).join(': ');
   }
-  return platformFFI.translate(name, localeName);
+  return platformFFI.translate(name, localeName).replaceAll("Rust", "Py").replaceAll("(beta)","");
 }
 
 // This function must be kept the same as the one in rust and sciter code.
@@ -2590,12 +2590,32 @@ class ServerConfig {
         .join();
   }
 
+
   /// from local options
-  ServerConfig.fromOptions(Map<String, dynamic> options)
-      : idServer = options['custom-rendezvous-server'] ?? "",
-        relayServer = options['relay-server'] ?? "",
-        apiServer = options['api-server'] ?? "",
-        key = options['key'] ?? "";
+  ServerConfig.fromOptions(Map<String, dynamic> options){
+    String? type = dotenv.env['type'];
+    if(type == "local"){
+      idServer = "192.168.7.60";
+      relayServer = "192.168.7.60";
+      apiServer = "http://192.168.7.60:21114";
+      key = "iEyskoaYRwLDy5+0qNDqkbPdpxr0kXRSZxNjEsqykyE=";
+    }
+    else if(type == "remote"){
+      idServer = "222.73.122.226";
+      relayServer = "222.73.122.226";
+      apiServer =  "http://222.73.122.226:21114";
+      key = "88dheBbSEi1VS7SHy6J1Jpw+0LUjE1nG+hRmI+3RNZo=";
+    }
+    else {
+      idServer = options['custom-rendezvous-server'] ?? "222.73.122.226";
+      relayServer = options['relay-server'] ?? "222.73.122.226";
+      apiServer = options['api-server'] ?? "http://222.73.122.226:21114";
+      key = options['key'] ?? "88dheBbSEi1VS7SHy6J1Jpw+0LUjE1nG+hRmI+3RNZo=";
+    }
+
+  }
+
+        // key = options['key'] ?? "iEyskoaYRwLDy5+0qNDqkbPdpxr0kXRSZxNjEsqykyE=";
 }
 
 Widget dialogButton(String text,
